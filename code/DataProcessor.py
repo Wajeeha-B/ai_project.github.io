@@ -1,5 +1,7 @@
 # get data from dataset folder
 
+# Contributions - everyone 
+
 import os
 import pandas as pd
 
