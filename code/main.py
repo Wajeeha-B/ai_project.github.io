@@ -1,30 +1,46 @@
-# import other files in to this file and run the code
+# Contributions - everyone 
 
 import sys
-sys.path.append('code')
 import DataProcessor
+sys.path.append('code')
+
+
+# ----------------parameters------------------
+train_size = 0.8 # 80% training data
+# columnsToKeep = ['Type', 'Price', 'Distance', 'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'BuildingArea']
+
+# !!! reducing featues for testing
+columnsToKeep = ['Price', 'Bedroom2']
+
 
 filepath = 'dataset/Melbourne_housing_FULL.csv'
+prediction_column = 'Price'
+# --------------------------------------------
+
+# ---------------Process Data-----------------
 dp_obj = DataProcessor.DataProcessor()
-data = dp_obj.LoadData(filepath)
+dp_obj.LoadData(filepath)
 
-columnsToKeep = ['Type', 'Price', 'Distance', 'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'BuildingArea']
-data = dp_obj.keepSelectedColumns(columnsToKeep)
+dp_obj.filterData()
+dp_obj.keepSelectedColumns(columnsToKeep)
+dp_obj.shuffleData()
 
-data = dp_obj.randomiseData()
+# !!! reduce data size for testing
+dp_obj.reduceDataSize(3000)
 
-data = dp_obj.dataFilter()
+train_X, train_Y, test_X, test_Y = dp_obj.splitData(train_size, prediction_column)
+# --------------------------------------------
 
-print("size of dataset: ", data.shape)
+# ---------------Train Model-----------------
+import NLRegression
+nlr = NLRegression.NLRegression(train_X, train_Y, test_X, test_Y)
+nlr.train()
+# --------------------------------------------
+# -------------Evaluate Model-----------------
+nlr.evaluate()
 
-# print(data.iloc[10])
+# --------------------------------------------
+# -------------Visualize Model----------------
+nlr.plot()
+# --------------------------------------------
 
-
-data_split = 0.8 # 80% training data
-training_data,test_data = dp_obj.splitData(data_split)
-
-
-# print(data.iloc[10])
-
-print("training size", len(training_data))
-print("test size", len(test_data))
