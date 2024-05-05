@@ -30,8 +30,12 @@ dp_obj.reduceDataSize(3000)
 
 train_X, train_Y, test_X, test_Y = dp_obj.splitData(train_size, prediction_column)
 # --------------------------------------------
-
-# ---------------Train Model-----------------
+# ------------kmeans Clustering---------------
+from kmeans import kmeans
+centroids, assignment = kmeans(train_X, train_Y, 'Bedroom2')
+print('clustering finished')
+# --------------------------------------------
+# ---------------Train Model------------------
 import NLRegression
 nlr = NLRegression.NLRegression(train_X, train_Y, test_X, test_Y)
 nlr.train()
