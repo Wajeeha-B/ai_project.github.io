@@ -34,7 +34,16 @@ train_X, train_Y, test_X, test_Y = dp_obj.splitData(train_size, prediction_colum
 # --------------------------------------------
 # ------------kmeans Clustering---------------
 from kmeans import kmeans
-centroids, assignment = kmeans(train_X, train_Y, 'Bedroom2')
+k = 5
+pref = 'Size'
+train_X, points, centroids = kmeans(train_X, train_Y, pref, k)
+
+from matplotlib import pyplot as plt
+from plotly import express as px, graph_objects as go
+
+plt.scatter(points[:,0], points[:,1], c=train_X['Assignment'],cmap='Set3')
+plt.scatter(centroids[:,0], centroids[:,1], c='k', marker='*')
+plt.show()
 
 # ---------------Evaluate using Elbow Method---------------
 elbow_method = ElbowMethod(train_X)

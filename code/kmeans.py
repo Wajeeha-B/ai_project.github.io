@@ -42,9 +42,5 @@ def kmeans(x, y, pref, k):
       centroids[i] = points[assignment==i].mean(axis=0)
     
   # print("Final centroids:", centroids)
-  # print(assignment)
-  # print(centroids.shape)
-  # print(centroids[:,0])
-  # print(centroids[:,1])
   x_new['Assignment'] = assignment
   return x_new, points, centroids
