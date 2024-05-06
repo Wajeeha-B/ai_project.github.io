@@ -19,6 +19,12 @@ class UserInterface:
         # Longitude
         longitude = input("Would you prefer 'east' or 'west'?")
 
+        if size == 0:
+            if type == 'u':
+                size = meanBuilding # Average size for unit
+            if type == 'h':
+                size = meanLand # Average size for house
+
         if latitude == 'north':
             latitude = -37.5903
         elif latitude == 'south':
@@ -36,11 +42,5 @@ class UserInterface:
             longitude = 144.9751
         elif longitude!= 'east' & longitude != 'west' & longitude != 0:
             print("Error! Please enter a valid longitude")
-
-        if size == 0:
-            if type == 'u':
-                size = meanBuilding # Average size for unit
-            if type == 'h':
-                size = meanLand # Average size for house
-
+        
         return type, bedrooms, bathrooms, car, size, latitude, longitude
