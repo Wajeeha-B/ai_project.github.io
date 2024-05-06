@@ -3,7 +3,7 @@
 import sys
 import DataProcessor
 from performance_metrics import ElbowMethod
-from sklearn.metrics import silhouette_score 
+from sklearn.metrics import silhouette_score
 sys.path.append('code')
 
 
@@ -12,7 +12,7 @@ train_size = 0.8 # 80% training data
 # columnsToKeep = ['Type', 'Price', 'Distance', 'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'BuildingArea']
 
 # !!! reducing featues for testing
-columnsToKeep = ['Price', 'Bedroom2']
+columnsToKeep = ['Price', 'Size']
 
 
 filepath = 'dataset/Melbourne_housing_FULL.csv'
@@ -28,7 +28,7 @@ dp_obj.keepSelectedColumns(columnsToKeep)
 dp_obj.shuffleData()
 
 # !!! reduce data size for testing
-dp_obj.reduceDataSize(3000)
+dp_obj.reduceDataSize(100)
 
 train_X, train_Y, test_X, test_Y = dp_obj.splitData(train_size, prediction_column)
 # --------------------------------------------
@@ -49,7 +49,7 @@ print("Silhouette Score:", silhouette_avg)
 # --------------------------------------------
 # ---------------Train Model------------------
 import NLRegression
-nlr = NLRegression.NLRegression(train_X, train_Y, test_X, test_Y)
+nlr = NLRegression.NLRegression(train_X, train_Y, test_X, test_Y, scale_data=False)
 nlr.train()
 # --------------------------------------------
 # -------------Evaluate Model-----------------
@@ -59,3 +59,4 @@ nlr.evaluate()
 # -------------Visualize Model----------------
 nlr.plot()
 # --------------------------------------------
+
