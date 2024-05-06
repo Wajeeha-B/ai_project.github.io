@@ -64,9 +64,6 @@ class NLRegression:
             constant_kernel = C(1.0, (1e-2, 1e+3)) # constant kernel, default value 1.0, bounds (1e-4, 1e+2)
             rbf_kernel = RBF(1.0, (1e-3, 1e+3)) # RBF kernel, default value 1.0, bounds (1e-5, 1e+2)
 
-
-
-
             self.kernel = constant_kernel * rbf_kernel
         else:
             self.kernel = kernel
