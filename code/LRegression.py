@@ -47,12 +47,6 @@ class LRegression:
         # Return MSE
         return self.y_mse
     
-    def predict(self):
-        # Return
-
-# For MAIN
-# --------------------------------------------
-# ---------------Train Model------------------
-# import LRegression
-# lr = LRegression.LRegression()
-# pred = lr.LinReg(features=train_X,target=train_Y,assignment=assignment)
+    def predict(self,features):
+        pred = features @ self.w
+        return pred.reshape(-1,1)
