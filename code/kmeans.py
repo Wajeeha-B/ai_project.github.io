@@ -5,8 +5,8 @@ import pandas as pd
 
 rng = np.random.default_rng(4)  # the most random number/ the constructor for creating random numbers
 
-def kmeans(x, y, pref):
-  
+def kmeans(x, y, pref, k):
+
   x_column = np.array(x[pref])
 #   print(x_column)
 
@@ -15,9 +15,13 @@ def kmeans(x, y, pref):
 
   points = np.hstack((x_column[:, np.newaxis], y_column[:, np.newaxis]))
   
+  x_new = x
+  # x_new['PointsX'] = points[:,0]
+  # x_new['PointsY'] = points[:,1]
+
   # Print the shape of the resulting array
   print(points.shape)
-  k = 10
+  # k = 10
 
   centroids = rng.choice(points, size=k, replace=False)
   # print("Initial centroids:", centroids)
@@ -38,4 +42,9 @@ def kmeans(x, y, pref):
       centroids[i] = points[assignment==i].mean(axis=0)
     
   # print("Final centroids:", centroids)
-  return centroids, assignment
+  # print(assignment)
+  # print(centroids.shape)
+  # print(centroids[:,0])
+  # print(centroids[:,1])
+  x_new['Assignment'] = assignment
+  return x_new, points, centroids
