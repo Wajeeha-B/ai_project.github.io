@@ -11,7 +11,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
 class NLRegression:
-    def __init__(self, train_X, train_Y, test_X, test_Y, scale_data=True, kernel=None):
+    def __init__(self, train_X, train_Y, test_X, test_Y, featuresToTrain ,scale_data=True, kernel=None):
         """
         Initialize the NLRegression model with training and testing data.
         Parameters:
@@ -20,6 +20,9 @@ class NLRegression:
         - scale_data: Boolean, whether to scale data using StandardScaler.
         - kernel: scikit-learn kernel object. If None, default kernel is used.
         """
+
+        train_X = train_X[featuresToTrain]
+        test_X = test_X[featuresToTrain]
 
         # Check if the input data is valid
         if any(v is None for v in [train_X, train_Y, test_X, test_Y]):
