@@ -5,12 +5,20 @@ class LRegression:
     def __init__(self):
         pass
 
-    def LinReg(self,features,target):
+    def LinReg(self,features,target, assignment):
         # Features to be used for regression
         self.features = features
 
         # Target for regression
         self.target = target
+
+        # Cluster assignment
+        self.assignment = assignment
+
+        for i in range(self.features.shape[0]):
+            if self.features['Assignment'][i] != assignment:
+                self.features.drop(i,axis=0)
+                self.target.drop(i,axis=0)
 
         # Assign inputs for calculation
         x1 = self.features
@@ -38,3 +46,7 @@ class LRegression:
 
         # Return MSE
         return self.y_mse
+    
+    def predict(self,features):
+        pred = features @ self.w
+        return pred.reshape(-1,1)

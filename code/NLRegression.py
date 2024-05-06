@@ -20,6 +20,8 @@ class NLRegression:
         - scale_data: Boolean, whether to scale data using StandardScaler.
         - kernel: scikit-learn kernel object. If None, default kernel is used.
         """
+
+        # Check if the input data is valid
         if any(v is None for v in [train_X, train_Y, test_X, test_Y]):
             raise ValueError("Please provide training and test data")
         if len(train_X) != len(train_Y):
@@ -40,7 +42,8 @@ class NLRegression:
             raise TypeError("test_Y must be a pandas Series")
         if test_X.ndim != 2 or test_Y.ndim != 1:
             raise ValueError("test_X must be two-dimensional and test_Y must be one-dimensional")
-        
+
+        # Normalize the data if needed
         self.scaler = StandardScaler() if scale_data else None
         if scale_data:
             train_X = pd.DataFrame(self.scaler.fit_transform(train_X), columns=train_X.columns)
@@ -50,6 +53,8 @@ class NLRegression:
         self.train_Y = train_Y
         self.test_X = test_X
         self.test_Y = test_Y
+
+        # look at using different kernels
 
         if kernel is None or not isinstance(kernel, (RBF, C)):
             """
@@ -99,6 +104,8 @@ class NLRegression:
             'sigma': sigma
         })
 
+        print(data)
+
         # Sort the DataFrame based on x values
         data_sorted = data.sort_values(by='x')
 
@@ -109,10 +116,10 @@ class NLRegression:
 
         # can't see this, could be the scale of the data
         plt.fill_between(data_sorted['x'],
-                 data_sorted['y_pred'] - 1.9600 * data_sorted['sigma'],
-                 data_sorted['y_pred'] + 1.9600 * data_sorted['sigma'],
+                 data_sorted['y_pred'] - 1.96,
+                 data_sorted['y_pred'] + 1.96,
                  alpha=0.5, facecolor='b', edgecolor='None', label='95% confidence interval')
-        plt.xlabel('Features')
+        plt.xlabel('Feature')
         plt.ylabel(self.test_Y.name) # base label name of y test data name
         plt.title('Gaussian Process Regression')
         plt.legend()
