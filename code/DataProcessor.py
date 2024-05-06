@@ -56,7 +56,7 @@ class DataProcessor:
 
                 self.data['Size'] = self.data['Landsize']
                 self.data.loc[self.data['Type'] == 'u', 'Size'] = self.data['BuildingArea']
-                self.data = self.data.drop(columns=['Landsize', 'BuildingArea'])
+                # self.data = self.data.drop(columns=['Landsize', 'BuildingArea'])
 
         if 'Car' in self.data.columns:
             self.data = self.data.fillna({'Car': 0})
@@ -96,3 +96,9 @@ class DataProcessor:
     
     def getData(self):
         return self.data
+
+    def getAverage(self, column):
+        try:
+            return self.data[column].mean()
+        except KeyError:
+            return None
