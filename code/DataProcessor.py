@@ -39,7 +39,6 @@ class DataProcessor:
         if 'Price' in self.data.columns:
             self.data.dropna(subset=['Price'], inplace=True)
             self.data = self.data[self.data['Price'] > 0]
-
         
         if 'Distance' in self.data.columns:
             self.data.dropna(subset=['Distance'], inplace=True)
@@ -63,8 +62,18 @@ class DataProcessor:
 
         if 'Bedroom2' in self.data.columns:
             self.data = self.data[self.data['Bedroom2'] < 10]
-            
 
+        if 'Latitude' in self.data.columns:
+            self.data.dropna(subset=['Latitude'], inplace=True)
+
+        if 'Longitude' in self.data.columns:
+            self.data.dropna(subset=['Longitude'], inplace=True)
+        
+        return self.data
+    
+
+    def encodeCategoricalData(self, columns):
+        self.data = pd.get_dummies(self.data, columns=columns)
         return self.data
 
         
@@ -83,12 +92,7 @@ class DataProcessor:
         print("test size", len(self.test_X))
 
         return self.train_X, self.train_Y, self.test_X, self.test_Y
-    
-    def encodeCategoricalData(self, columns):
-        # From Quiz 1, one-hot encoding
 
-        # !!! still need to implement this
-        pass 
         
     def reduceDataSize(self, n):
         self.data = self.data.head(n)
