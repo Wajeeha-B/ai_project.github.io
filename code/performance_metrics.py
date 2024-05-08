@@ -3,30 +3,35 @@
 # * Elbow method (optimising number of clusters)​   - ​Elbow Method will help find the optimal number of clusters by identifying the point where increasing clusters doesn’t significantly improve data fit. 
 # * Silhouette score    - Silhouette score will be used to assess cluster quality. Higher scores mean better matched data within clusters compared to other clusters. 
 
-import matplotlib.pyplot as plt
 import numpy as np
-import Kmeans
-
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
 
 class ElbowMethod:
-    def __init__(self, kmeans_instance):
-        self.kmeans_instance = kmeans_instance
-        self.inertia_values = []
+    def __init__(self, data):
+        self.data = data
+        self.squared_distances = []
+        self.optimal_k = None
     
-    def evaluate(self, max_clusters):
+    def evaluate(self, max_clusters=10):
         for k in range(1, max_clusters + 1):
-            self.kmeans_instance.k = k
-            x_new, points, centroids = self.kmeans_instance.cluster()  # Cluster for the current k
-            inertia = np.sum((points - centroids)**2)  # Calculate the inertia
-            self.inertia_values.append(inertia)
+            kmeans = KMeans(n_clusters=k)
+            kmeans.fit(self.data)
+            self.squared_distances.append(kmeans.inertia_)
     
     def plot(self):
-        plt.plot(range(1, len(self.inertia_values) + 1), self.inertia_values, marker='o')
+        plt.plot(range(1, len(self.squared_distances) + 1), self.squared_distances, marker='o')
         plt.xlabel('Number of Clusters (K)')
-        plt.ylabel('Inertia')
+        plt.ylabel('Sum of Squared Distances')
         plt.title('Elbow Method for Optimal K')
         plt.show()
-
+    
+    def optimal_number_of_clusters(self):
+        # Find the elbow point (where the rate of decrease slows down)
+        deltas = np.diff(self.squared_distances, 2)
+        curvature = np.abs(deltas)
+        self.optimal_k = np.argmax(curvature) + 1
+        return self.optimal_k
 
 
 def calculate_silhouette_score(points, assignment):
