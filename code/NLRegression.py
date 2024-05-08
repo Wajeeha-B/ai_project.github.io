@@ -92,7 +92,7 @@ class NLRegression:
         return score
     
     def plot(self):
-        """Plot the actual vs. predicted values with confidence intervals."""
+        """Plot the actual vs. predicted values with standard deviation."""
         # Get predictions and confidence intervals
         y_pred, std = self.predict(self.test_X)
 
@@ -126,7 +126,7 @@ class NLRegression:
                         alpha=0.2, facecolor='blue', label='std')
         plt.xlabel('Feature')
         plt.ylabel(self.test_Y.name or 'Target')
-        plt.title('Gaussian Process Regression with Confidence Intervals')
+        plt.title('Gaussian Process Regression with Standard Deviation')
         plt.legend()
         plt.grid(True)
         plt.show()

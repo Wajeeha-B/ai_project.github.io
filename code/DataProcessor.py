@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.impute import SimpleImputer
 
 class DataProcessor:
     def __init__(self):
@@ -35,6 +36,11 @@ class DataProcessor:
         return self.data
     
     def filterData(self):
+        
+        # apply imuations
+        columns = self.data.columns
+        # self.data = self.applyImpuations(columns) # impute missing values
+
         # dropping empty columns
 
         # check it exists before dropping to avoid errors
@@ -142,5 +148,15 @@ class DataProcessor:
 
         number_of_rows_after = self.data.shape[0]
         print(f"Number of rows removed: {number_of_rows_before - number_of_rows_after}")
+        print(f"Number of rows remaining: {number_of_rows_after}")
 
+        return self.data
+    
+    # currently not working
+    def applyImpuations(self, columns):
+        imputer = SimpleImputer(strategy='mean')
+
+        # only apply to columns with numbers 
+        numeric_columns = [col for col in columns if pd.api.types.is_numeric_dtype(self.data[col])]
+        self.data[numeric_columns] = imputer.fit_transform(self.data[numeric_columns])
         return self.data
