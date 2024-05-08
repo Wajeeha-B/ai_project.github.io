@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.preprocessing import StandardScaler
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
-
+from numpy import sqrt, diag
 
 class NLRegression:
     def __init__(self, train_X, train_Y, test_X, test_Y, featuresToTrain):
@@ -82,20 +82,19 @@ class NLRegression:
 
     def predict(self, input_data=None):
         """Predict using the trained Gaussian Process Regressor."""
-        y_pred, sigma = self.gp.predict(input_data, return_std=True)
-        return y_pred, sigma
+        y_pred, std = self.gp.predict(input_data, return_std=True)
+        return y_pred, std
 
-    # def evaluate(self):
-    #     """Evaluate the model using the test data."""
-    #     y_pred, sigma = self.predict(self.test_X)
-    #     score = self.gp.score(self.test_X, self.test_Y)
-    #     print("R² Score:", score)
-    #     return score
+    def evaluate(self):
+        """Evaluate the model using the test data."""
+        score = self.gp.score(self.test_X, self.test_Y)
+        print("R² Score:", score)
+        return score
     
     def plot(self):
         """Plot the actual vs. predicted values with confidence intervals."""
         # Get predictions and confidence intervals
-        y_pred, sigma = self.predict(self.test_X)
+        y_pred, std = self.predict(self.test_X)
 
         # Ensure all data is converted to numpy arrays
         x = self.test_X.iloc[:, 0].values.flatten()
@@ -105,8 +104,8 @@ class NLRegression:
             'x': x,
             'y': y,
             'y_pred': y_pred,
-            'lower_bound': y_pred - 1.96 * sigma,
-            'upper_bound': y_pred + 1.96 * sigma
+            'lower_bound': y_pred - std,
+            'upper_bound': y_pred + std
         })
 
         # Sort data based on x values and ensure numpy arrays
@@ -124,7 +123,7 @@ class NLRegression:
         plt.fill_between(x_vals,
                         lower_vals,
                         upper_vals,
-                        alpha=0.2, facecolor='blue', label='95% Confidence Interval')
+                        alpha=0.2, facecolor='blue', label='std')
         plt.xlabel('Feature')
         plt.ylabel(self.test_Y.name or 'Target')
         plt.title('Gaussian Process Regression with Confidence Intervals')

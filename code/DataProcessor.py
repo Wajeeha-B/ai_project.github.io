@@ -2,6 +2,8 @@
 
 import os
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 class DataProcessor:
     def __init__(self):
@@ -106,3 +108,39 @@ class DataProcessor:
             return self.data[column].mean()
         except KeyError:
             return None
+        
+    def remove_outliers(self, columns, plot=False):
+        # Filter columns to include only numeric data types
+        numeric_columns = [col for col in columns if pd.api.types.is_numeric_dtype(self.data[col])]
+
+        number_of_rows_before = self.data.shape[0]
+
+        for column in numeric_columns:
+            # Calculate IQR for each column
+            Q1 = self.data[column].quantile(0.25)
+            Q3 = self.data[column].quantile(0.75)
+            IQR = Q3 - Q1
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+
+            # Remove rows where the column value is outside the IQR bounds
+            self.data = self.data[(self.data[column] >= lower_bound) & (self.data[column] <= upper_bound)]
+
+            # Optionally plot the cleaned data
+            if plot:
+                plt.figure(figsize=(4, 3))
+                ax = sns.boxplot(
+                    x=self.data[column],
+                    boxprops={'facecolor': 'lightblue', 'alpha': 0.6},
+                    flierprops={'marker': 'o', 'markerfacecolor': 'red', 'markersize': 8, 'alpha': 0.9},
+                    whiskerprops={'color': 'black'},
+                    capprops={'color': 'black'}
+                )
+                ax.set_title(f'Boxplot after Outlier Removal: {column}')
+                ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+                plt.show()
+
+        number_of_rows_after = self.data.shape[0]
+        print(f"Number of rows removed: {number_of_rows_before - number_of_rows_after}")
+
+        return self.data
