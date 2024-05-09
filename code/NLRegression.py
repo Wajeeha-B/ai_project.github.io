@@ -74,6 +74,11 @@ class NLRegression:
         rbf_kernel = RBF(1.0, (1e-3, 1e+3))
         self.kernel = constant_kernel * rbf_kernel
 
+    def scaleData(self, data):
+        """Scale the input data using the trained scalers."""
+        self.scaler_features = StandardScaler()
+        return pd.DataFrame(self.scaler_features.fit_transform(data), columns=data.columns)
+
     def train(self):
         """Train the Gaussian Process Regressor."""
         self.gp = GaussianProcessRegressor(kernel=self.kernel, n_restarts_optimizer=10) # optimizer='fmin_l_bfgs_b')

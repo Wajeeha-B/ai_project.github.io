@@ -35,7 +35,26 @@ class DataProcessor:
         self.data = self.data.sample(frac=1).reset_index(drop=True)
         return self.data
     
-    def filterData(self):
+    def filterRentData(self):
+        columns = self.data.columns
+        # Posted On,BHK,Rent,Size,Floor,Area Type,Area Locality,City,Furnishing Status,Tenant Preferred,Bathroom,Point of Contact
+
+        # remove posted on column
+        if 'Posted On' in self.data.columns:
+            self.data = self.data.drop(columns=['Posted On'])
+
+        if 'Floor' in self.data.columns:
+            self.data = self.data.drop(columns=['Floor'])
+        
+        if 'Area Type' in self.data.columns:
+            self.data = self.data.drop(columns=['Area Type'])
+
+        if 'Rent' in self.data.columns:
+            self.data.dropna(subset=['Rent'], inplace=True)
+            self.data = self.data[self.data['Rent'] > 0]
+
+    
+    def filterMelbourneData(self):
         
         # apply imuations
         columns = self.data.columns
@@ -54,6 +73,12 @@ class DataProcessor:
         if 'Bathroom' in self.data.columns:
             self.data.dropna(subset=['Bathroom'], inplace=True)
             self.data = self.data[self.data['Bathroom'] >= 1]
+
+        if 'Latitude' in self.data.columns:
+            self.data.dropna(subset=['Latitude'], inplace=True)
+
+        if 'Longitude' in self.data.columns:
+            self.data.dropna(subset=['Longitude'], inplace=True)
         
         if 'Type' in self.data.columns:
             self.data['Type'] = self.data['Type'].replace('t', 'h')
@@ -70,12 +95,6 @@ class DataProcessor:
 
         if 'Bedroom2' in self.data.columns:
             self.data = self.data[self.data['Bedroom2'] < 10]
-
-        if 'Latitude' in self.data.columns:
-            self.data.dropna(subset=['Latitude'], inplace=True)
-
-        if 'Longitude' in self.data.columns:
-            self.data.dropna(subset=['Longitude'], inplace=True)
         
         return self.data
     
@@ -91,10 +110,10 @@ class DataProcessor:
         self.test_set = self.data.drop(self.train_set.index)
 
         self.train_X = self.train_set.drop(columns=prediction_column)
-        self.train_Y = self.train_set['Price']
+        self.train_Y = self.train_set[prediction_column]
 
         self.test_X = self.test_set.drop(columns=prediction_column)
-        self.test_Y = self.test_set['Price']
+        self.test_Y = self.test_set[prediction_column]
 
         print("training size", len(self.train_X))
         print("test size", len(self.test_X))
@@ -160,3 +179,4 @@ class DataProcessor:
         numeric_columns = [col for col in columns if pd.api.types.is_numeric_dtype(self.data[col])]
         self.data[numeric_columns] = imputer.fit_transform(self.data[numeric_columns])
         return self.data
+    
