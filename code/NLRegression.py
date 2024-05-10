@@ -58,13 +58,25 @@ class NLRegression:
         train_X, test_X = train_X.align(test_X, join='left', axis=1, fill_value=0)
 
         # Initialize scalers and apply scaling to features and targets
+        # Need to remember to inverse transform the target when predicting
+
         self.scaler_features = StandardScaler()
+        
         self.train_X = pd.DataFrame(self.scaler_features.fit_transform(train_X), columns=train_X.columns)
+
         self.test_X = pd.DataFrame(self.scaler_features.transform(test_X), columns=test_X.columns)
 
         self.scaler_target = StandardScaler()
         self.train_Y = pd.Series(self.scaler_target.fit_transform(train_Y.values.reshape(-1, 1)).flatten(), name=train_Y.name)
         self.test_Y = pd.Series(self.scaler_target.transform(test_Y.values.reshape(-1, 1)).flatten(), name=test_Y.name)
+
+        # plot each scaled feature against the target
+        for feature in self.train_X.columns:
+            plt.scatter(self.train_X[feature], self.train_Y)
+            plt.xlabel(feature)
+            plt.ylabel(self.train_Y.name)
+            plt.show()
+
 
         """
         The constant kernel represents a constant function that predicts the mean of the target variable.
@@ -76,18 +88,43 @@ class NLRegression:
 
     def scaleData(self, data):
         """Scale the input data using the trained scalers."""
-        self.scaler_features = StandardScaler()
-        return pd.DataFrame(self.scaler_features.fit_transform(data), columns=data.columns)
+        if isinstance(data, pd.Series):
+            # Reshape the data and retain the original index as columns
+            data_df = pd.DataFrame([data.values], columns=data.index)
+            scaled = pd.DataFrame(self.scaler_features.transform(data_df), columns=data.index)
+        else:
+            # Directly transform if it's already a DataFrame
+            scaled = pd.DataFrame(self.scaler_features.transform(data), columns=data.columns)
+
+        return scaled
 
     def train(self):
         """Train the Gaussian Process Regressor."""
         self.gp = GaussianProcessRegressor(kernel=self.kernel, n_restarts_optimizer=10) # optimizer='fmin_l_bfgs_b')
         
         self.gp.fit(self.train_X, self.train_Y)
+        self.evaluate()
 
     def predict(self, input_data=None):
         """Predict using the trained Gaussian Process Regressor."""
         y_pred, std = self.gp.predict(input_data, return_std=True)
+        return y_pred, std
+    
+    def predictActual(self, input_data=None):
+        """Predict using the trained Gaussian Process Regressor and return predictions with uncertainty."""
+        # Ensure input data is scaled correctly
+        scaled_data = self.scaleData(input_data)
+
+        # Make predictions using the Gaussian Process model
+        y_pred, std = self.gp.predict(scaled_data, return_std=True)
+
+        # Inverse transform the predictions back to the original scale
+        y_pred = self.scaler_target.inverse_transform(y_pred.reshape(-1, 1)).flatten()
+
+        # Inverse transform the standard deviation as an estimate of uncertainty
+        # Note: StandardScaler does not directly affect standard deviations, thus apply sqrt and diag
+        std = sqrt(diag(std))
+
         return y_pred, std
 
     def evaluate(self):
