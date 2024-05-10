@@ -66,16 +66,19 @@ class NLRegression:
 
         self.test_X = pd.DataFrame(self.scaler_features.transform(test_X), columns=test_X.columns)
 
+        # self.train_Y = train_Y
+        # self.test_Y = test_Y
+
         self.scaler_target = StandardScaler()
         self.train_Y = pd.Series(self.scaler_target.fit_transform(train_Y.values.reshape(-1, 1)).flatten(), name=train_Y.name)
         self.test_Y = pd.Series(self.scaler_target.transform(test_Y.values.reshape(-1, 1)).flatten(), name=test_Y.name)
 
         # plot each scaled feature against the target
-        for feature in self.train_X.columns:
-            plt.scatter(self.train_X[feature], self.train_Y)
-            plt.xlabel(feature)
-            plt.ylabel(self.train_Y.name)
-            plt.show()
+        # for feature in self.train_X.columns:
+        #     plt.scatter(self.train_X[feature], self.train_Y)
+        #     plt.xlabel(feature)
+        #     plt.ylabel(self.train_Y.name)
+        #     plt.show()
 
 
         """
@@ -116,14 +119,14 @@ class NLRegression:
         scaled_data = self.scaleData(input_data)
 
         # Make predictions using the Gaussian Process model
-        y_pred, std = self.gp.predict(scaled_data, return_std=True)
+        y_pred, std = self.predict(scaled_data)
 
         # Inverse transform the predictions back to the original scale
         y_pred = self.scaler_target.inverse_transform(y_pred.reshape(-1, 1)).flatten()
 
         # Inverse transform the standard deviation as an estimate of uncertainty
         # Note: StandardScaler does not directly affect standard deviations, thus apply sqrt and diag
-        std = sqrt(diag(std))
+        std = sqrt(std)
 
         return y_pred, std
 
