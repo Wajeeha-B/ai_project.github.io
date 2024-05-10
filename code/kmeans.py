@@ -14,25 +14,26 @@ class Kmeans:
     self.rng = np.random.default_rng(10)  # the most random number/ the constructor for creating random numbers
 
   def cluster(self):
-    if self.pref == 'Type':
-      mapping = {'h': 0, 'u': 1}
+    # if self.pref == 'Type':
+    #   mapping = {'h': 0, 'u': 1}
 
-      x_column = self.x[self.pref].copy()
+    #   x_column = self.x[self.pref].copy()
 
-      for key, value in mapping.items():
-        x_column.replace(key, value, inplace=True)
+    #   for key, value in mapping.items():
+    #     x_column.replace(key, value, inplace=True)
 
-      x_column = np.array(x_column)
-
-    else:
-      x_column = np.array(self.x[self.pref])
-    #   print(x_column)
+    #   x_column = np.array(x_column)
+    mapping = {'h': 1.0, 'u': 2.0}
+    self.x['Type'] = self.x['Type'].map(mapping)
     
-
+    x_column = np.array(self.x[self.pref])
+    # print(x_column)
+    
     y_column = np.array(self.y)
     #   print(y_column)
 
-    points = np.hstack((x_column[:, np.newaxis], y_column[:, np.newaxis]))
+    # points = np.hstack((x_column[:, np.newaxis], y_column[:, np.newaxis]))
+    points = np.hstack((x_column, y_column[:, np.newaxis]))
     
     x_new = self.x
     # x_new['PointsX'] = points[:,0]
@@ -59,7 +60,8 @@ class Kmeans:
         centroids[i] = points[assignment==i].mean(axis=0)
       
     # print("Final centroids:", centroids)
-    x_new['Assignment' + self.pref] = assignment
+    # x_new['Assignment' + self.pref] = assignment
+    x_new['Assignment'] = assignment
     return x_new, points, centroids
 
 
