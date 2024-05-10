@@ -44,7 +44,8 @@ model.train()
 model.cross_validate()
 model.plot()
 
-for i in range(5):
-    pred, std = model.predictActual(test_X.iloc[i])
-    print("prediction: ", pred[0])
-    print("actual:     ", test_Y.iloc[i])
+# for i in range(5):
+#     pred, bounds = model.predictActual(test_X.iloc[i])
+#     print("prediction:  ", pred[0])
+#     print("bounds:      ", bounds[0], bounds[1])
+#     print("actual:      ", test_Y.iloc[i])
