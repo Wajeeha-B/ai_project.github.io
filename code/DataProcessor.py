@@ -180,3 +180,14 @@ class DataProcessor:
         self.data[numeric_columns] = imputer.fit_transform(self.data[numeric_columns])
         return self.data
     
+
+    def calculateCorelation(self, columns, plot=True):
+
+        # columns - list of columns to calculate correlation
+        self.correlation_matrix = self.data[columns].corr()
+        if plot: 
+            plt.figure(figsize=(6, 5))
+            sns.heatmap(self.correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm')
+            plt.title('Correlation Matrix Heatmap')
+            plt.show()
+        return self.correlation_matrix

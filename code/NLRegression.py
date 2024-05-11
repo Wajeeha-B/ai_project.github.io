@@ -175,8 +175,8 @@ class NLRegression:
             'x': x,
             'y': y,
             'y_pred': y_pred,
-            'lower_bound': y_pred - std,
-            'upper_bound': y_pred + std
+            'lower_bound': y_pred - std*1.5,
+            'upper_bound': y_pred + std*1.5
         })
 
         # Sort data based on x values and ensure numpy arrays
@@ -215,6 +215,12 @@ class NLRegression:
         """Save the trained model to a file."""
         with open(filename, 'wb') as file:
             pickle.dump(self, file)
+
+        # also save a txt file that contains the features used, size of training data, and the R² score
+        with open(f"{filename}.txt", 'w') as file:
+            file.write(f"Features: {self.train_X.columns.tolist()}\n")
+            file.write(f"Training Data Size: {len(self.train_X)}\n")
+            file.write(f"R² Score: {self.evaluate()}\n")
 
     
     def loadModel(self, filename):
