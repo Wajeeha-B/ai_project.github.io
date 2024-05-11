@@ -213,7 +213,7 @@ class NLRegression:
     
     def saveModel(self, filename):
         """Save the trained model to a file."""
-        with open(filename, 'wb') as file:
+        with open(f"{filename}.pkl", 'wb') as file:
             pickle.dump(self, file)
 
         # also save a txt file that contains the features used, size of training data, and the R² score
