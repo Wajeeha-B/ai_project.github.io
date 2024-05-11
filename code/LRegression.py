@@ -37,6 +37,6 @@ class LRegression:
         # Return MSE
         return self.y_mse
     
-    def predict(self,features,w):
+    def predict(features,w):
         pred = features @ w
         return pred.reshape(-1,1)
