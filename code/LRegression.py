@@ -11,11 +11,12 @@ class LRegression:
         for value,assignment in zip(values,assignments):
             if value not in x.columns or assignment not in x.columns:
                 continue
-            print("value = ",value,"assignment = ",assignment)
             x1 = x.loc[:,value][x[assignment] == k]
             y1 = y[x[assignment] == k]
             x1 = x1.values.reshape(-1,1)
             y1 = y1.values.reshape(-1,1)
+            # x1 = x1.reshape(-1,1)
+            # y1 = y1.reshape(-1,1)
             x1t = np.transpose(x1)
             x1tx = np.dot(x1t,x1)
             x1tx_inv = np.linalg.inv(x1tx)
