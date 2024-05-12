@@ -111,6 +111,7 @@ class NLRegression:
 
     def predict(self, input_data=None):
         """Predict using the trained Gaussian Process Regressor."""
+        scaled_data = self.scaleData(input_data)
         y_pred, std = self.gp.predict(input_data, return_std=True)
         return y_pred, std
     
@@ -137,13 +138,10 @@ class NLRegression:
 
     def evaluate(self):
         """Evaluate the model using the test data."""
-        y_pred = self.gp.predict(self.test_X)
+        y_pred, _ = self.predictActual(self.test_X)
 
-        y_pred = self.scaler_target.inverse_transform(y_pred.reshape(-1, 1)).flatten()
-        test_Y = self.scaler_target.inverse_transform(self.test_Y.values.reshape(-1, 1)).flatten()
-
-        rmse = np.sqrt(mean_squared_error(test_Y, y_pred))
-        mae = mean_absolute_error(test_Y, y_pred)
+        rmse = np.sqrt(mean_squared_error(self.test_Y, y_pred))
+        mae = mean_absolute_error(self.test_Y, y_pred)
         r_2 = self.gp.score(self.test_X, self.test_Y)
         print(f"Mean Squared Error: {rmse}")
         print(f"Mean Absolute Error: {mae}")

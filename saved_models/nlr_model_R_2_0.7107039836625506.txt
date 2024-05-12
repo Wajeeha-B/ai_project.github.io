@@ -1,0 +1,5 @@
+Features: ['Latitude', 'BuildingArea', 'Landsize', 'Longitude']
+Training Data Size: 500
+R² Score: 0.7107039836625506
+RMSE: 833601.4504348919
+MAE: 833601.450158474

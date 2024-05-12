@@ -148,7 +148,7 @@ class DataProcessor:
             Q3 = self.data[column].quantile(0.75)
             IQR = Q3 - Q1
 
-            bound_factor = 1.0
+            bound_factor = 0.5
 
             lower_bound = Q1 - bound_factor * IQR
             upper_bound = Q3 + bound_factor * IQR

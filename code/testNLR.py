@@ -13,11 +13,11 @@ data = load_boston()
 print(data.keys())
 
 # plot each feature against price
-# for i in range(3):
-#     plt.scatter(data[0][:, i], data[1])
-#     plt.xlabel("Feature" + str(i))
-#     plt.ylabel("Price")
-#     plt.show()
+for i in range(3):
+    plt.scatter(data.data[:, i], data.target)
+    plt.xlabel(data.feature_names[i])
+    plt.ylabel("Price")
+    plt.show()
 
 
 # only use the first 5 features for training
