@@ -82,6 +82,8 @@ class DataProcessor:
         
         if 'Type' in self.data.columns:
             self.data['Type'] = self.data['Type'].replace('t', 'h')
+
+            self.data = self.data[self.data['Type'] == 'h']
             
             if 'Landsize' in self.data.columns and 'BuildingArea' in self.data.columns:
                 self.data = self.data.dropna(subset=['Landsize', 'BuildingArea'])

@@ -14,20 +14,20 @@ class Kmeans:
     self.rng = np.random.default_rng(10)  # the most random number/ the constructor for creating random numbers
 
   def cluster(self):
-    if self.pref == 'Type':
-      mapping = {'h': 0, 'u': 1}
+    # if self.pref == 'Type':
+    #   # mapping = {'h': 0, 'u': 1}
 
-      x_column = self.x[self.pref].copy()
+    #   # x_column = self.x[self.pref].copy()
 
-      for key, value in mapping.items():
-        x_column.replace(key, value, inplace=True)
-
-      x_column = np.array(x_column)
+    #   # for key, value in mapping.items():
+    #   #   x_column.replace(key, value, inplace=True)
+      
+    #   x_column = np.array(x_column)
     # mapping = {'h': 1.0, 'u': 2.0}
     # self.x['Type'] = self.x['Type'].map(mapping)
     
-    else:
-      x_column = np.array(self.x[self.pref])
+    # else:
+    x_column = np.array(self.x[self.pref])
     # print(x_column)
     
     y_column = np.array(self.y)
