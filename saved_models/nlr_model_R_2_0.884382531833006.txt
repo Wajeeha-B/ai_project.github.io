@@ -1,0 +1,6 @@
+Features: ['Size', 'Latitude', 'Longitude', 'Bedroom', 'Bathroom', 'AssignmentLatitude', 'AssignmentLongitude']
+Training Data Size: 1600
+
+Mean Squared Error: 156385.6896403813
+Mean Absolute Error: 120781.84884087047
+R² Score: 0.884382531833006
