@@ -145,8 +145,11 @@ class DataProcessor:
             Q1 = self.data[column].quantile(0.25)
             Q3 = self.data[column].quantile(0.75)
             IQR = Q3 - Q1
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
+
+            bound_factor = 1.0
+
+            lower_bound = Q1 - bound_factor * IQR
+            upper_bound = Q3 + bound_factor * IQR
 
             # Remove rows where the column value is outside the IQR bounds
             self.data = self.data[(self.data[column] >= lower_bound) & (self.data[column] <= upper_bound)]

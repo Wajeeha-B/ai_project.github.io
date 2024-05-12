@@ -4,12 +4,12 @@
 
 import pandas as pd
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel, Matern, RationalQuadratic
-from sklearn.model_selection import train_test_split, cross_val_score, KFold
+from sklearn.gaussian_process.kernels import RBF, ConstantKernel, RationalQuadratic
+from sklearn.model_selection import cross_val_score, KFold
 from sklearn.preprocessing import StandardScaler
-from scipy.optimize import minimize
+from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error
 import matplotlib.pyplot as plt
-from numpy import sqrt, diag
+import numpy as np
 import pickle
 
 class NLRegression:
@@ -86,7 +86,7 @@ class NLRegression:
         The RBF kernel represents a stationary kernel that models the covariance of the target variable.
         """
         constant_kernel = ConstantKernel(1.0, (1e-2, 1e+3))
-        rbf_kernel = RBF(1.0, (1e-3, 1e+3))
+        # rbf_kernel = RBF(1.0, (1e-3, 1e+3))
         RQ = RationalQuadratic(length_scale=1.0)
         self.kernel = constant_kernel * RQ
 
@@ -125,7 +125,6 @@ class NLRegression:
         # Inverse transform the predictions back to the original scale
         y_pred = self.scaler_target.inverse_transform(y_pred.reshape(-1, 1)).flatten()
 
-        # apply this to std too
         std = self.scaler_target.inverse_transform(std.reshape(-1, 1)).flatten()
 
         # Determine the z-value for 95% confidence interval
@@ -138,9 +137,18 @@ class NLRegression:
 
     def evaluate(self):
         """Evaluate the model using the test data."""
-        score = self.gp.score(self.test_X, self.test_Y)
-        print("R² Score:", score)
-        return score
+        y_pred = self.gp.predict(self.test_X)
+
+        y_pred = self.scaler_target.inverse_transform(y_pred.reshape(-1, 1)).flatten()
+        test_Y = self.scaler_target.inverse_transform(self.test_Y.values.reshape(-1, 1)).flatten()
+
+        rmse = np.sqrt(mean_squared_error(test_Y, y_pred))
+        mae = mean_absolute_error(test_Y, y_pred)
+        r_2 = self.gp.score(self.test_X, self.test_Y)
+        print(f"Mean Squared Error: {rmse}")
+        print(f"Mean Absolute Error: {mae}")
+        print("R² Score:", r_2)
+        return rmse, mae, r_2
     
     def confidenceScore(self, std):
         """Calculate a confidence score from standard deviation using Pandas, with 100% being fully confident."""
@@ -210,7 +218,6 @@ class NLRegression:
         print(f"Cross-Validation Scores (R²): {scores}")
         print(f"Mean R²: {scores.mean()}, Standard Deviation: {scores.std()}")
 
-    
     def saveModel(self, filename):
         """Save the trained model to a file."""
         with open(f"{filename}.pkl", 'wb') as file:
@@ -220,7 +227,12 @@ class NLRegression:
         with open(f"{filename}.txt", 'w') as file:
             file.write(f"Features: {self.train_X.columns.tolist()}\n")
             file.write(f"Training Data Size: {len(self.train_X)}\n")
-            file.write(f"R² Score: {self.evaluate()}\n")
+
+            # Evaluate the model and write the R² score, RMSE, and MAE
+            rmse, mae, r_2 = self.evaluate()
+            file.write(f"R² Score: {r_2}\n")
+            file.write(f"RMSE: {rmse}\n")
+            file.write(f"MAE: {mae}\n")
 
     
     def loadModel(self, filename):
