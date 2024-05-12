@@ -1,0 +1,3 @@
+Features: ['Size', 'Latitude', 'Longitude', 'Bedroom', 'Bathroom', 'AssignmentLatitude', 'AssignmentLongitude']
+Training Data Size: 800
+R² Score: 0.8568833874570595
