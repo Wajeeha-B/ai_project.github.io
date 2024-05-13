@@ -24,7 +24,8 @@ The data is read in and processed using the DataProcessor class. This class narr
 @Ashton
 
 <!-- Linear Regression -->
-@John
+Based on the clusters of each feature, linear regression is completed to calculate the weights.
+Details are provided in the LRegression class, located in the 'LRegression.py' file.
 
 <!-- Gaussian Processing (Non-Linear Regression) -->
 @Lucas
@@ -33,7 +34,8 @@ The data is read in and processed using the DataProcessor class. This class narr
 @Wajeeha
 
 <!-- User Interface -->
-@John
+For operation of the algorithm, a user interface was developed that accepts user preferences for the value of each feature.
+If an input is unknown, a '0' may be input and a default value will be provided.
 
 <!-- Prediction -->
 @John & @Lucas
