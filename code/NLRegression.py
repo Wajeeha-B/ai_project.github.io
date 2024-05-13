@@ -73,6 +73,7 @@ class NLRegression:
         self.train_Y = pd.Series(self.scaler_target.fit_transform(train_Y.values.reshape(-1, 1)).flatten(), name=train_Y.name)
         self.test_Y = pd.Series(self.scaler_target.transform(test_Y.values.reshape(-1, 1)).flatten(), name=test_Y.name)
 
+
         # plot each scaled feature against the target
         # for feature in self.train_X.columns:
         #     plt.scatter(self.train_X[feature], self.train_Y)
@@ -126,10 +127,13 @@ class NLRegression:
         # Inverse transform the predictions back to the original scale
         y_pred = self.scaler_target.inverse_transform(y_pred.reshape(-1, 1)).flatten()
 
-        std = self.scaler_target.inverse_transform(std.reshape(-1, 1)).flatten()
+        variance = np.power(std, 2)
+        std = np.sqrt(variance * self.scaler_target.scale_)
+
+        # std = self.scaler_target.inverse_transform(std.reshape(-1, 1)).flatten()
 
         # Determine the z-value for 95% confidence interval
-        z = 1.96
+        z = 196 # !!! need to fix this
 
         # Calculate the confidence score based on the standard deviation
         bounds = [y_pred - z * std, y_pred + z * std]

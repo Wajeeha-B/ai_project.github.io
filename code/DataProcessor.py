@@ -5,6 +5,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.impute import SimpleImputer
+import scipy.stats as stats
 
 class DataProcessor:
     def __init__(self):
@@ -196,3 +197,12 @@ class DataProcessor:
             plt.title('Correlation Matrix Heatmap')
             plt.show()
         return self.correlation_matrix
+    
+    
+    def plotDataNormalDistribution(self):
+        self.data.hist(bins=50, figsize=(20, 15))
+        plt.show()
+
+        # # Q-Q plot
+        # stats.probplot(self.data, dist="norm", plot=plt)
+        # plt.show()
