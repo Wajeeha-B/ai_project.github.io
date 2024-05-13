@@ -197,6 +197,9 @@ class NLRegression:
         lower_vals = data_sorted['lower_bound'].values
         upper_vals = data_sorted['upper_bound'].values
 
+
+        # !!! fix this. What is actually being plotted on the 'x' axis?
+
         # Plot using an alternative function (scatter or step)
         plt.figure(figsize=(10, 6))
         plt.scatter(x_vals, y_vals, color='red', label='Actual')
@@ -205,7 +208,7 @@ class NLRegression:
                         lower_vals,
                         upper_vals,
                         alpha=0.2, facecolor='blue', label='std')
-        plt.xlabel('Feature')
+        plt.xlabel('Samples')
         plt.ylabel(self.test_Y.name or 'Target')
         plt.title('Gaussian Process Regression with Standard Deviation')
         plt.legend()
