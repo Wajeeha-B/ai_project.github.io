@@ -200,7 +200,7 @@ class DataProcessor:
     
     
     def plotDataNormalDistribution(self):
-        self.data.hist(bins=50, figsize=(20, 15))
+        self.data.hist(bins=50, figsize=(12, 7))
         plt.show()
 
         # # Q-Q plot
