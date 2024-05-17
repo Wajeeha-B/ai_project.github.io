@@ -4,6 +4,12 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from plotly import express as px, graph_objects as go
+from scipy.linalg import svd
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+from sklearn.manifold import TSNE
 
 class Kmeans:
   def __init__(self, x, y, k, pref) -> None:
@@ -14,19 +20,6 @@ class Kmeans:
     self.rng = np.random.default_rng(10)  # the most random number/ the constructor for creating random numbers
 
   def cluster(self):
-    # if self.pref == 'Type':
-    #   # mapping = {'h': 0, 'u': 1}
-
-    #   # x_column = self.x[self.pref].copy()
-
-    #   # for key, value in mapping.items():
-    #   #   x_column.replace(key, value, inplace=True)
-      
-    #   x_column = np.array(x_column)
-    # mapping = {'h': 1.0, 'u': 2.0}
-    # self.x['Type'] = self.x['Type'].map(mapping)
-    
-    # else:
     x_column = np.array(self.x[self.pref])
     # print(x_column)
     
@@ -37,11 +30,6 @@ class Kmeans:
     # points = np.hstack((x_column, y_column[:, np.newaxis]))
     
     x_new = self.x
-    # x_new['PointsX'] = points[:,0]
-    # x_new['PointsY'] = points[:,1]
-
-    # Print the shape of the resulting array
-    # print(points.shape)
 
     centroids = self.rng.choice(points, size=self.k, replace=False)
     # print("Initial centroids:", centroids)
@@ -65,6 +53,70 @@ class Kmeans:
     # x_new['Assignment'] = assignment
     return x_new, points, centroids
 
+  def pca(self, prefs):
+    # X = np.array(self.x[prefs])
+    # B =X-X.mean(axis=0)
+    # _, self.s, self.Vh = svd(B, full_matrices=False) # Calculate the SVD on
+    # self.coeff = np.dot(np.diag(np.sqrt(self.s)), self.Vh)
+    
+    X = self.x[prefs]
+    X.loc[:, 'Price'] = self.y
+    # Standardize the features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    # Initialize PCA; specify the number of components to keep
+    pca = PCA(n_components=8)
+
+    # Fit PCA on the standardized data
+    principal_components = pca.fit_transform(X_scaled)
+
+    # Check the explained variance
+    explained_variance = pca.explained_variance_ratio_
+    cumulative_explained_variance = explained_variance.cumsum()
+
+    print("Explained Variance Ratio by Each Component:\n", explained_variance)
+    print("Cumulative Explained Variance:\n", cumulative_explained_variance)
+
+    # Choose the number of components that explain up to 95% of the variance
+    # n_components = next(i for i, total in enumerate(cumulative_explained_variance) if total > 0.95) + 1
+    # print("n_components: ", n_components)
+
+    n_components = 2
+    # Apply PCA with the chosen number of components
+    pca = PCA(n_components=n_components)
+    principal_components = pca.fit_transform(X_scaled)
+
+    # Create a DataFrame with the principal components
+    pc_columns = [f'PC{i+1}' for i in range(n_components)]
+    principal_df = pd.DataFrame(data=principal_components, columns=pc_columns)
+
+    # Example: Add the principal components to the original DataFrame
+    df_principal = pd.concat([self.x, principal_df], axis=1)
+
+    # Now you can use df_principal for further analysis or modeling
+    print(df_principal.head())
+    self.df_principal = df_principal
+
+  def tSNE(self, prefs):
+
+    X = self.x[prefs]
+    X.loc[:, 'Price'] = self.y
+    # Standardize the features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    # Initialize t-SNE to reduce to 2 dimensions
+    tsne = TSNE(n_components=2, random_state=42)
+
+    # Fit t-SNE on the standardized data and transform the data
+    X_tsne = tsne.fit_transform(X_scaled)
+
+    # Create a DataFrame with the t-SNE components
+    tsne_columns = ['tSNE1', 'tSNE2']
+    tsne_df = pd.DataFrame(data=X_tsne, columns=tsne_columns)
+    self.tsne_df = tsne_df
+
 
   def plotKmean(self, x, points, centroids, pref):
     plt.scatter(points[:,0], points[:,1], c=x['Assignment' + pref],cmap='Set3')
@@ -72,4 +124,31 @@ class Kmeans:
     plt.xlabel(pref)  # Set label for x-axis
     plt.ylabel('Price')  # Set label for y-axis
     plt.title('Price Vs ' + self.pref)  # Set title for the plot
+    plt.show()
+
+  def plotPCA(self):
+    # plt.scatter(self.coeff[:,0], self.coeff[:,1])
+    # plt.quiver(
+    #     self.Vh[:,0], self.Vh[:,1],
+    #     angles='xy',
+    #     scale_units='xy',
+    #     scale=1,
+    # )
+    # plt.axis('equal')
+    # plt.show()
+    # print("Coefficient:", self.Vh)
+    plt.scatter(self.df_principal['PC1'], self.df_principal['PC2'])
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    plt.title('2D PCA Plot')
+    plt.show()
+
+  def plotTSNE(self):
+    # Visualize the t-SNE components
+    plt.figure(figsize=(8, 6))
+    plt.scatter(self.tsne_df['tSNE1'], self.tsne_df['tSNE2'], c='blue', label='Data points')
+    plt.title('t-SNE Visualization')
+    plt.xlabel('t-SNE Component 1')
+    plt.ylabel('t-SNE Component 2')
+    plt.legend()
     plt.show()
