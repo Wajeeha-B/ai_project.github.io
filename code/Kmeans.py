@@ -8,36 +8,44 @@ from scipy.linalg import svd
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-
 from sklearn.manifold import TSNE
 
 class Kmeans:
   def __init__(self, x, y, k, pref) -> None:
+    # Store the frequently used variables
     self.x = x
     self.y = y
     self.k = k
     self.pref = pref
-    self.rng = np.random.default_rng(10)  # the most random number/ the constructor for creating random numbers
+    # Defines a random number generator
+    self.rng = np.random.default_rng(10)
 
   def cluster(self):
+    # Store the preferred feature in a single column as a np array
     x_column = np.array(self.x[self.pref])
     # print(x_column)
     
+    # Store the price data in a single column np array
     y_column = np.array(self.y)
-    #   print(y_column)
+    # print(y_column)
 
+    # Combine the x and y column into a single array
     points = np.hstack((x_column[:, np.newaxis], y_column[:, np.newaxis]))
     # points = np.hstack((x_column, y_column[:, np.newaxis]))
     
+    # Copy the input dataframe
     x_new = self.x
 
+    # Randomly generate centroid positions
     centroids = self.rng.choice(points, size=self.k, replace=False)
     # print("Initial centroids:", centroids)
-    assignment = np.zeros(len(points), dtype=int)
 
+    # Allocate space for the assignments
+    assignment = np.zeros(len(points), dtype=int)
     assignment_prev = None
 
-    while assignment_prev is None or any(assignment_prev!=assignment): #ans : assignment_prev is None or any(assignment_prev != assignment)
+    # While loop to iterate on centroid locations till converged
+    while assignment_prev is None or any(assignment_prev!=assignment):
       assignment_prev= np.copy(assignment) # First keep track of the latest assignment
 
       for i, point in enumerate(points):
@@ -49,18 +57,18 @@ class Kmeans:
         centroids[i] = points[assignment==i].mean(axis=0)
       
     # print("Final centroids:", centroids)
+
+    # Adds an assignment column to the output dataframe
     x_new['Assignment' + self.pref] = assignment
     # x_new['Assignment'] = assignment
+    
     return x_new, points, centroids
 
   def pca(self, prefs):
-    # X = np.array(self.x[prefs])
-    # B =X-X.mean(axis=0)
-    # _, self.s, self.Vh = svd(B, full_matrices=False) # Calculate the SVD on
-    # self.coeff = np.dot(np.diag(np.sqrt(self.s)), self.Vh)
-    
+    # Combines x and y
     X = self.x[prefs]
     X.loc[:, 'Price'] = self.y
+    
     # Standardize the features
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
@@ -78,11 +86,9 @@ class Kmeans:
     print("Explained Variance Ratio by Each Component:\n", explained_variance)
     print("Cumulative Explained Variance:\n", cumulative_explained_variance)
 
-    # Choose the number of components that explain up to 95% of the variance
-    # n_components = next(i for i, total in enumerate(cumulative_explained_variance) if total > 0.95) + 1
-    # print("n_components: ", n_components)
-
+    # Number of output components
     n_components = 2
+
     # Apply PCA with the chosen number of components
     pca = PCA(n_components=n_components)
     principal_components = pca.fit_transform(X_scaled)
@@ -99,9 +105,10 @@ class Kmeans:
     self.df_principal = df_principal
 
   def tSNE(self, prefs):
-
+    # Combines x and y
     X = self.x[prefs]
     X.loc[:, 'Price'] = self.y
+
     # Standardize the features
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
@@ -119,24 +126,16 @@ class Kmeans:
 
 
   def plotKmean(self, x, points, centroids, pref):
+    # Visualise the clusters
     plt.scatter(points[:,0], points[:,1], c=x['Assignment' + pref],cmap='Set3')
     plt.scatter(centroids[:,0], centroids[:,1], c='k', marker='*')
-    plt.xlabel(pref)  # Set label for x-axis
-    plt.ylabel('Price')  # Set label for y-axis
-    plt.title('Price Vs ' + self.pref)  # Set title for the plot
+    plt.xlabel(pref)
+    plt.ylabel('Price')
+    plt.title('Price Vs ' + self.pref)
     plt.show()
 
   def plotPCA(self):
-    # plt.scatter(self.coeff[:,0], self.coeff[:,1])
-    # plt.quiver(
-    #     self.Vh[:,0], self.Vh[:,1],
-    #     angles='xy',
-    #     scale_units='xy',
-    #     scale=1,
-    # )
-    # plt.axis('equal')
-    # plt.show()
-    # print("Coefficient:", self.Vh)
+    # Visualise the principal components
     plt.scatter(self.df_principal['PC1'], self.df_principal['PC2'])
     plt.xlabel('Principal Component 1')
     plt.ylabel('Principal Component 2')
@@ -144,7 +143,7 @@ class Kmeans:
     plt.show()
 
   def plotTSNE(self):
-    # Visualize the t-SNE components
+    # Visualise the t-SNE components
     plt.figure(figsize=(8, 6))
     plt.scatter(self.tsne_df['tSNE1'], self.tsne_df['tSNE2'], c='blue', label='Data points')
     plt.title('t-SNE Visualization')

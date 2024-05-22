@@ -66,7 +66,7 @@ for pref in prefs:
     train_X, points, centroids = kmeansTrain.cluster()
     all_points.append(points)
     all_centroids.append(centroids)
-    # kmeansTrain.plotKmean(train_X, points, centroids, pref)
+    kmeansTrain.plotKmean(train_X, points, centroids, pref)
 
 # Perform KMeans clustering for each preference in testing data
 for pref in prefs:
@@ -75,9 +75,11 @@ for pref in prefs:
     all_points.append(points)
     all_centroids.append(centroids)
 
+# Generate and plot PCA
 kmeansTrain.pca(prefs)
 kmeansTrain.plotPCA()
 
+# Generate and plot t-SNE
 kmeansTrain.tSNE(prefs)
 kmeansTrain.plotTSNE()
 # ----------------------------------------------- LINEAR REGRESSION -----------------------------------------------
