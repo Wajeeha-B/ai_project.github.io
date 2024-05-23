@@ -1,18 +1,18 @@
 # ai_project.github.io
 
 <!-- COLLABORATORS -->
-> Ashton Powell | 13915196
-> John Hunter | 13938838
-> Lucas Moore | 14173177
+> Ashton Powell | 13915196 • 
+> John Hunter | 13938838 • 
+> Lucas Moore | 14173177 • 
 > Wajeeha Batool | 14279261
 
 <!-- PREPARED FOR -->
-> Dr Raphael Falque
-> Dr Fred Sukkar
-> Monisha Uttsha
-> Nadim Haque
-> 41118 Artificial Intelligence in Robotics
-> Autumn 2024
+> Dr Raphael Falque • 
+> Dr Fred Sukkar • 
+> Monisha Uttsha • 
+> Nadim Haque • 
+> 41118 Artificial Intelligence in Robotics • 
+> Autumn 2024 • 
 > University of Technology Sydney (UTS)
 
 <!-- Overview -->
@@ -20,13 +20,13 @@ This project uses Machine Learning (ML) techniques to estimate house prices in M
 
 <!-- Features -->
 The features include:
-> Number of bedrooms
-> Number of bathrooms
-> Number of parking spaces
-> Landsize (sqm)
-> Building area (sqm)
-> Latitude (general area, north or south)
-> Longitude (general area, east or west)
+> Number of bedrooms • 
+> Number of bathrooms • 
+> Number of parking spaces • 
+> Landsize (sqm) • 
+> Building area (sqm) • 
+> Latitude (general area, north or south) • 
+> Longitude (general area, east or west) • 
 
 <!-- Dataset -->
 The dataset uses nearly 35,000 dwelling sales from across Melbourne, VIC, Australia. It was sourced from the below:
