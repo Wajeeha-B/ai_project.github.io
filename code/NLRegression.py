@@ -12,6 +12,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.inspection import permutation_importance
+import itertools
+
 class NLRegression:
     def __init__(self, train_X, train_Y, test_X, test_Y, featuresToTrain):
         """
@@ -88,7 +92,7 @@ class NLRegression:
         """
         constant_kernel = ConstantKernel(1.0, (1e-2, 1e+3))
         # rbf_kernel = RBF(1.0, (1e-3, 1e+3))
-        RQ = RationalQuadratic(length_scale=1.0)
+        RQ = RationalQuadratic(length_scale=10.0)
         self.kernel = constant_kernel * RQ
 
     def scaleData(self, data):
@@ -178,37 +182,27 @@ class NLRegression:
         y_pred, std = self.predict(self.test_X)
 
         # Ensure all data is converted to numpy arrays
-        x = self.test_X.iloc[:, 0].values.flatten()
-        y = self.test_Y.values.flatten()
+        indices = np.arange(len(self.test_Y))
+        y_vals = self.test_Y.values.flatten()
+        y_pred_vals = y_pred.flatten()
+        lower_vals = y_pred - std * 1.96  # 95% confidence interval
+        upper_vals = y_pred + std * 1.96  # 95% confidence interval
 
+        # Create DataFrame for plotting
         data = pd.DataFrame({
-            'x': x,
-            'y': y,
-            'y_pred': y_pred,
-            'lower_bound': y_pred - std*1.5,
-            'upper_bound': y_pred + std*1.5
+            'Index': indices,
+            'Actual': y_vals,
+            'Predicted': y_pred_vals,
+            'Lower Bound': lower_vals,
+            'Upper Bound': upper_vals
         })
 
-        # Sort data based on x values and ensure numpy arrays
-        data_sorted = data.sort_values(by='x')
-        x_vals = data_sorted['x'].values
-        y_vals = data_sorted['y'].values
-        y_pred_vals = data_sorted['y_pred'].values
-        lower_vals = data_sorted['lower_bound'].values
-        upper_vals = data_sorted['upper_bound'].values
-
-
-        # !!! fix this. What is actually being plotted on the 'x' axis?
-
-        # Plot using an alternative function (scatter or step)
+        # Plot using indices
         plt.figure(figsize=(10, 6))
-        plt.scatter(x_vals, y_vals, color='red', label='Actual')
-        plt.plot(x_vals, y_pred_vals, color='blue', label='Predicted')
-        plt.fill_between(x_vals,
-                        lower_vals,
-                        upper_vals,
-                        alpha=0.2, facecolor='blue', label='std')
-        plt.xlabel('Samples')
+        plt.scatter(data['Index'].values, data['Actual'].values, color='red', label='Actual')
+        plt.plot(data['Index'].values, data['Predicted'].values, color='blue', label='Predicted')
+        plt.fill_between(data['Index'].values, data['Lower Bound'].values, data['Upper Bound'].values, alpha=0.2, facecolor='blue', label='95% CI')
+        plt.xlabel('Sample Index')
         plt.ylabel(self.test_Y.name or 'Target')
         plt.title('Gaussian Process Regression with Standard Deviation')
         plt.legend()
@@ -239,10 +233,57 @@ class NLRegression:
             file.write(f"RMSE: {rmse}\n")
             file.write(f"MAE: {mae}\n")
 
-    
     def loadModel(self, filename):
         """Load a trained model from a file."""
         with open(filename, 'rb') as file:
             model = pickle.load(file)
         
         self.gp = model.gp
+
+    def train_random_forest(self):
+        """Train a Random Forest Regressor to identify important features and potential interactions."""
+        # Initialize and train the Random Forest model
+        self.rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+        self.rf_model.fit(self.train_X, self.train_Y)
+
+        # Get feature importances
+        importances = self.rf_model.feature_importances_
+        feature_importance_df = pd.DataFrame({
+            'Feature': self.train_X.columns,
+            'Importance': importances
+        }).sort_values(by='Importance', ascending=False)
+
+        print("Feature Importances from Random Forest:")
+        print(feature_importance_df)
+
+        # Identify potential interactions using permutation importance
+        result = permutation_importance(self.rf_model, self.train_X, self.train_Y, n_repeats=10, random_state=42, n_jobs=-1)
+        sorted_importances_idx = result.importances_mean.argsort()
+        
+        print("Permutation Importances:")
+        for idx in sorted_importances_idx:
+            print(f"{self.train_X.columns[idx]}: {result.importances_mean[idx]}")
+
+        return feature_importance_df
+
+    def identify_interactions(self, top_n=5):
+        """Identify potential interactions between the top_n most important features."""
+        feature_importance_df = self.train_random_forest()
+        top_features = feature_importance_df.head(top_n)['Feature']
+        feature_pairs = list(itertools.combinations(top_features, 2))
+        
+        return feature_pairs
+
+    
+    def create_interaction_terms(self, feature_pairs):
+        """Create interaction terms for the specified pairs of features."""
+        for feature1, feature2 in feature_pairs:
+            interaction_term = self.train_X[feature1] * self.train_X[feature2]
+            interaction_term.name = f"{feature1}_x_{feature2}"
+            self.train_X = self.train_X.assign(**{interaction_term.name: interaction_term})
+
+            interaction_term_test = self.test_X[feature1] * self.test_X[feature2]
+            interaction_term_test.name = f"{feature1}_x_{feature2}"
+            self.test_X = self.test_X.assign(**{interaction_term_test.name: interaction_term_test})
+
+        return self.train_X, self.test_X

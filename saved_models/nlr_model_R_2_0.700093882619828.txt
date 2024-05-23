@@ -1,0 +1,5 @@
+Features: ['Latitude', 'BuildingArea', 'Longitude', 'Bathroom', 'Bedroom']
+Training Data Size: 1050
+R² Score: 0.700093882619828
+RMSE: 876169.1598378058
+MAE: 876169.1598049862

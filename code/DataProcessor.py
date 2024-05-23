@@ -6,6 +6,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.impute import SimpleImputer
 import scipy.stats as stats
+from scipy.stats import boxcox
+from sklearn.preprocessing import PowerTransformer
+
 
 class DataProcessor:
     def __init__(self):
@@ -149,7 +152,7 @@ class DataProcessor:
             Q3 = self.data[column].quantile(0.75)
             IQR = Q3 - Q1
 
-            bound_factor = 0.5
+            bound_factor = 1.5
 
             lower_bound = Q1 - bound_factor * IQR
             upper_bound = Q3 + bound_factor * IQR
@@ -206,3 +209,20 @@ class DataProcessor:
         # # Q-Q plot
         # stats.probplot(self.data, dist="norm", plot=plt)
         # plt.show()
+
+    def createInteractionTerm(self, feature_interact_1, feature_interact_2):
+        newFeatureName = feature_interact_1 + "_" + feature_interact_2
+        self.data[newFeatureName] = self.data[feature_interact_1] * self.data[feature_interact_2]
+        return newFeatureName
+
+    def applyTransforms(self):
+        # Apply log transformation to each column
+        pt = PowerTransformer(method='yeo-johnson')
+
+        for column in self.data.columns:
+            # skip price column
+            if column == 'Price':
+                continue
+            # skip if negative
+            if pd.api.types.is_numeric_dtype(self.data[column]) and (self.data[column] > 0).all():
+                self.data[column] = pt.fit_transform(self.data[column].values.reshape(-1, 1))

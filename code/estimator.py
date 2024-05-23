@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
+from PySide6.QtWidgets import QApplication
 
 # ----------------------------------------------- DATA PROCESSING -----------------------------------------------
 
@@ -34,7 +35,8 @@ dp_obj.keepSelectedColumns(columnsToKeep)
 dp_obj.filterMelbourneData()
 dp_obj.remove_outliers(columnsToKeep, plot=False)
 dp_obj.shuffleData()
-dp_obj.reduceDataSize(1000)  # Remove this line to train on the full dataset
+allData = dp_obj.getData()  # for user interface at the end
+dp_obj.reduceDataSize(100)  # Remove this line to train on the full dataset
 
 # Calculate correlation for selected columns
 columnsToCorrelate = ['Price', 'Bedroom', 'Bathroom', 'Car', 'Landsize', 'BuildingArea', 'Latitude', 'Longitude']
@@ -66,7 +68,6 @@ for pref in prefs:
     train_X, points, centroids = kmeansTrain.cluster()
     all_points.append(points)
     all_centroids.append(centroids)
-    # kmeansTrain.plotKmean(train_X, points, centroids, pref)
 
 # Perform KMeans clustering for each preference in testing data
 for pref in prefs:
@@ -80,6 +81,7 @@ kmeansTrain.plotPCA()
 
 kmeansTrain.tSNE(prefs)
 kmeansTrain.plotTSNE()
+
 # ----------------------------------------------- LINEAR REGRESSION -----------------------------------------------
 
 # Train Linear Regression model
@@ -113,7 +115,7 @@ print("Testing error (houses) = ", test_mse)
 # ----------------------------------------------- NON-LINEAR REGRESSION -----------------------------------------------
 
 # Define features for training (ordered by correlation to price)
-featuresToTrain = ['Latitude', 'BuildingArea', 'Landsize', 'Longitude']
+featuresToTrain = ['Latitude', 'BuildingArea', 'Longitude', 'Bathroom', 'Bedroom']
 
 # Check if a new model should be trained
 query = input("Do you want to train a new model? (y/n): ")
@@ -124,12 +126,12 @@ if query == 'y':
     query = input("Do you want to save the model? (y/n): ")
     if query == 'y':
         _, _, r_2 = nlr.evaluate()
-        filepath_ = f'../saved_models/nlr_model_R_2_{r_2}'
+        filepath_ = f'./saved_models/nlr_model_R_2_{r_2}'
         nlr.saveModel(filepath_)
 else:
     nlr = NLRegression.NLRegression(train_X, train_Y, test_X, test_Y, featuresToTrain)
     filename_ = input("Enter the filename of the model to load: ")
-    filepath_ = f'../saved_models/{filename_}'
+    filepath_ = f'./saved_models/{filename_}'
     nlr.loadModel(filepath_)
 
 # Plot predictions vs expected values
@@ -178,26 +180,49 @@ print("Silhouette Score:", silhouette_avg)
 meanLand = dp_obj.getAverage('Landsize')
 meanBuilding = dp_obj.getAverage('BuildingArea')
 
-# Input user preferences
-user_pref = UserInterface.UserInterface()
-bedrooms, bathrooms, car, landsize, buildingarea, latitude, longitude = user_pref.Inputs(meanLand, meanBuilding)
-print("Bedrooms =", bedrooms, "Bathrooms =", bathrooms, "Car parks =", car, "Land size =", landsize, "Building area =", buildingarea, "Latitude =", latitude, "Longitude =", longitude)
+# Instantiate UserInterface and run the GUI
+app = QApplication(sys.argv)
+user_interface = UserInterface.UserInterface()
+user_interface.gui_inputs(allData)
+user_interface.show()
+app.exec_()
 
-# Return predicted value from Linear Regression
+# Retrieve and unpack the result after the event loop ends
+result = user_interface.get_result()
 
-# Assign feature inputs
-targets = [bedrooms, bathrooms, car, landsize, buildingarea, latitude, longitude]
+if result:
+    bedrooms, bathrooms, car, landsize, buildingarea, latitude, longitude = result
+    print("Bedrooms =", bedrooms, "Bathrooms =", bathrooms, "Car parks =", car, "Land size =", landsize, "Building area =", buildingarea, "Latitude =", latitude, "Longitude =", longitude)
 
-# Make prediction for each level
-pred = lr.predict(targets, w)
+    # Return predicted value from Linear Regression
 
-# Return minimum and maximum predicted values
-print("Minimum value = $", np.min(pred).round(2))
-print("Maximum value = $", np.max(pred).round(2))
+    # Assign feature inputs
+    targets = [bedrooms, bathrooms, car, landsize, buildingarea, latitude, longitude]
 
-# Predict actual value using Non-Linear Regression
-sample = pd.Series([latitude, buildingarea, landsize, longitude], index=featuresToTrain)
-pred, bounds = nlr.predictActual(sample)
-print("Prediction: $", pred[0].round(2))
-print("Min:     $", bounds[0].round(2)[0])
-print("Max:     $", bounds[1].round(2)[0])
+    # Make prediction for each level
+    pred = lr.predict(targets, w)
+
+    # Return minimum and maximum predicted values
+    print("Minimum value = $", np.min(pred).round(2))
+    print("Maximum value = $", np.max(pred).round(2))
+
+    # Predict actual value using Non-Linear Regression
+    sample = pd.Series([latitude, buildingarea, longitude, bathrooms, bedrooms], index=featuresToTrain)
+    pred, bounds = nlr.predictActual(sample)
+
+    pred_rounded = pred.round(2)[0]
+
+    lowerBound = bounds[0].round(2)[0]
+    upperBound = bounds[1].round(2)[0]
+
+    print("Prediction: $", pred_rounded)
+    print("Min:     $", lowerBound)
+    print("Max:     $", upperBound)
+
+    houses = user_interface.get_houses_within_range(allData, pred_rounded, latitude, longitude, buildingarea, bathrooms, bedrooms, car)
+
+    # Print the houses
+    print("Existing houses with given features: ")
+    print(houses)
+else:
+    print("No input received from the user.")
