@@ -136,8 +136,7 @@ class NLRegression:
 
         # std = self.scaler_target.inverse_transform(std.reshape(-1, 1)).flatten()
 
-        # Determine the z-value for 95% confidence interval
-        z = 196 # !!! need to fix this
+        z = 300
 
         # Calculate the confidence score based on the standard deviation
         bounds = [y_pred - z * std, y_pred + z * std]
