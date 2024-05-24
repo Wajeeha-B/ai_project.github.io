@@ -1,3 +1,5 @@
+# Contributions - John, Lucas
+
 import sys
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QSlider, QPushButton, QHBoxLayout, QScrollArea
 from PySide6.QtCore import Qt
