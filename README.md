@@ -63,8 +63,14 @@ The `NLRegression` class implements Gaussian Process Regression for predicting h
 
 
 ## Evaluation Metrics
-### @Wajeeha
-Detailed comments are provided in the `ElbowMethod` class, located in the `performance_metrics.py` file.
+In this project, we employ several evaluation metrics to assess our models:
+
+- **Elbow Method**
+The Elbow Method helps identify the optimal number of clusters (K) for K-Means by plotting the sum of squared distances between data points and centroids. The "elbow" point, where the decrease slows, indicates the best K.
+
+- **Silhouette Score**
+The Silhouette Score measures clustering quality by comparing the average distance between points in the same cluster (intra-cluster distance) and the average distance to points in the nearest cluster (inter-cluster distance). Scores range from -1 to 1, with higher values indicating better-defined clusters.
+
 
 ## User Interface
 The `UserInterface` class is designed to provide a graphical interface for users to input their preferences for house features. This interface supports both console-based inputs and a graphical slider-based input system using the PySide6 library.
