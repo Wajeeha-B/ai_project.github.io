@@ -36,7 +36,7 @@ dp_obj.filterMelbourneData()
 dp_obj.remove_outliers(columnsToKeep, plot=False)
 dp_obj.shuffleData()
 allData = dp_obj.getData()  # for user interface at the end
-dp_obj.reduceDataSize(2100)  # Remove this line to train on the full dataset
+# dp_obj.reduceDataSize(2100)  # Remove this line to train on the full dataset
 
 # Split data into training and testing sets
 train_X, train_Y, test_X, test_Y = dp_obj.splitData(train_size, prediction_column)
@@ -79,7 +79,7 @@ kmeansTrain.tSNE(prefs)
 featuresToTrain = ['Latitude', 'BuildingArea', 'Longitude', 'Bathroom', 'Bedroom']
 
 nlr = NLRegression.NLRegression(train_X, train_Y, test_X, test_Y, featuresToTrain)
-filename_ = 'nlr_model_R_2_0.7054281317585951.pkl'
+filename_ = 'nlr_model_R_2_0.694415207533843.pkl'
 filepath_ = f'./saved_models/{filename_}'
 nlr.loadModel(filepath_)
 

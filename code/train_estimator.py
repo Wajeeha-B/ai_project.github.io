@@ -36,7 +36,7 @@ dp_obj.filterMelbourneData()
 dp_obj.remove_outliers(columnsToKeep, plot=False)
 dp_obj.shuffleData()
 allData = dp_obj.getData()  # for user interface at the end
-dp_obj.reduceDataSize(100)  # Remove this line to train on the full dataset
+# dp_obj.reduceDataSize(100)  # Remove this line to train on the full dataset
 
 # Calculate correlation for selected columns
 columnsToCorrelate = ['Price', 'Bedroom', 'Bathroom', 'Car', 'Landsize', 'BuildingArea', 'Latitude', 'Longitude']
@@ -141,7 +141,10 @@ else:
 nlr.plot()
 
 # Perform cross-validation
-nlr.cross_validate()
+print("Would you like to cross-validate? ")
+query = input("Enter 'y' for yes or 'n' for no: ")
+if query == 'y':
+    nlr.cross_validate()
 
 # -------------------------------------------- EVALUATION METRICS --------------------------------------------
 
