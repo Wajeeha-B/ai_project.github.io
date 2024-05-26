@@ -122,3 +122,6 @@ For operation of the algorithm, an integrated script `estimator` is used. Detail
 
 ## Final usage:
 To use a graphical user interface with a pre-trained model, the `GUI_estimator.py` executable is provided. A window with sliders for each feature will pop up when this script is run. These sliders are initialised to the average value for each feature and limited to the minimum and maximum values of the trained dataset, allowing users to adjust values as needed. Users who are unsure about a specific feature can leave the slider at its default average value.
+
+## Final Video Link
+https://youtu.be/UMgpFvDuKzc
