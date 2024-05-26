@@ -79,7 +79,7 @@ kmeansTrain.tSNE(prefs)
 featuresToTrain = ['Latitude', 'BuildingArea', 'Longitude', 'Bathroom', 'Bedroom']
 
 nlr = NLRegression.NLRegression(train_X, train_Y, test_X, test_Y, featuresToTrain)
-filename_ = 'nlr_model_R_2_0.694415207533843.pkl'
+filename_ = 'nlr_model_R_2_0.7054281317585951.pkl'
 filepath_ = f'./saved_models/{filename_}'
 nlr.loadModel(filepath_)
 
